@@ -1,0 +1,159 @@
+/* ==================================================================
+ * views.css — 分析视图面板（数据表 / 图表 / 统计 / 缺失 / 相关性）
+ * ================================================================== */
+
+.view-tabs {
+  display: flex; align-items: center; gap: 3px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+  overflow-x: auto;
+}
+.view-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 11px;
+  font-family: inherit; font-size: 11.5px; font-weight: 500;
+  color: var(--txt-2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.16s var(--ease), color 0.16s var(--ease), border-color 0.16s var(--ease);
+}
+.view-tab:hover { background: var(--panel-2); color: var(--txt-0); }
+.view-tab.on {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+  font-weight: 600;
+}
+.view-tab svg { width: 13px; height: 13px; flex: none; }
+.view-tab .cnt {
+  font-family: var(--mono); font-size: 9px; color: var(--txt-3);
+  background: var(--panel-3); padding: 0 5px; border-radius: 999px;
+}
+.view-tab.on .cnt { background: transparent; color: var(--accent); }
+
+.view-live {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: var(--txt-3); flex: none; white-space: nowrap;
+}
+.view-live .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--txt-3);
+}
+.view-live.on .dot { background: var(--ok); animation: livePulse 1.8s var(--ease) infinite; }
+@keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+.view-live.on { color: var(--ok); }
+
+.view-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  flex: none; flex-wrap: wrap;
+  background: var(--panel-2);
+}
+.view-bar .grp { display: flex; align-items: center; gap: 5px; }
+.view-bar .lab { font-size: 10px; color: var(--txt-3); white-space: nowrap; }
+.view-bar select.sel, .view-bar input.inp { height: 24px; font-size: 11px; flex: none; width: auto; min-width: 72px; }
+.view-bar .divider { width: 1px; height: 18px; background: var(--line-2); }
+
+.ctypes { display: flex; gap: 2px; flex-wrap: wrap; }
+.ctype {
+  font-family: inherit; font-size: 10.5px;
+  padding: 3px 8px; border-radius: var(--r-xs);
+  border: 1px solid transparent; background: transparent;
+  color: var(--txt-2); cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.ctype:hover { background: var(--panel-3); color: var(--txt-0); }
+.ctype.on { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+.view-body {
+  flex: 1 1 auto; min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+.view-pane { position: absolute; inset: 0; padding: 10px 12px; display: flex; flex-direction: column; }
+.view-pane.enter { animation: paneIn 0.34s var(--ease-out) both; }
+@keyframes paneIn { from { opacity: 0; transform: translateY(6px); } }
+.view-pane.scroll { overflow: auto; display: block; }
+
+/* 图表容器 */
+.chart-host { flex: 1 1 auto; min-height: 0; position: relative; }
+.chart-host svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.chart-host .empty-stage { position: absolute; inset: 0; }
+
+.chart-note {
+  flex: none; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+  margin-top: 7px;
+}
+.chart-note .pill { font-size: 10px; }
+
+/* 分组图例 */
+.legend { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 6px; flex: none; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: var(--txt-2); }
+.legend-item i { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+
+/* 相关矩阵 */
+.corr-wrap { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.corr-table { border-collapse: separate; border-spacing: 2px; font-family: var(--mono); font-size: 10px; }
+.corr-table th {
+  font-weight: 600; color: var(--txt-2); padding: 3px 6px;
+  font-size: 9.5px; white-space: nowrap; text-align: right;
+  position: sticky; top: 0; background: var(--bg-1); z-index: 1;
+}
+.corr-table th.rowh {
+  text-align: left; position: sticky; left: 0; background: var(--bg-1); z-index: 2;
+}
+.corr-cell {
+  width: 46px; height: 26px; border-radius: var(--r-xs);
+  text-align: center; color: var(--txt-0);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  cursor: default;
+}
+.corr-cell:hover { transform: scale(1.08); box-shadow: var(--shadow-pop); z-index: 3; position: relative; }
+.corr-cell.diag { color: var(--txt-3); }
+
+/* 统计视图 */
+.stat-cards { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; flex: none; }
+.stat-card {
+  flex: 1 1 130px; min-width: 0;
+  border-radius: var(--r-md); border: 1px solid var(--line);
+  background: var(--panel-2); padding: 9px 11px;
+}
+.stat-card .sc-name {
+  font-family: var(--mono); font-size: 10.5px; font-weight: 650;
+  color: var(--accent); margin-bottom: 6px;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+}
+.stat-card .sc-name .dt { font-size: 8.5px; color: var(--txt-3); font-weight: 400; }
+.stat-card .sc-row { display: flex; justify-content: space-between; gap: 8px; font-size: 10.5px; padding: 1px 0; }
+.stat-card .sc-row .k { color: var(--txt-3); font-family: var(--mono); font-size: 9.5px; }
+.stat-card .sc-row .v { font-family: var(--mono); color: var(--txt-0); font-weight: 600; }
+.stat-card .sc-bar { height: 4px; border-radius: 2px; background: var(--panel-3); margin-top: 7px; overflow: hidden; }
+.stat-card .sc-bar i { display: block; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s var(--ease-out); }
+
+/* 缺失值视图 */
+.miss-summary { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; flex: none; }
+.miss-row { display: grid; grid-template-columns: 110px 1fr 74px; gap: 9px; align-items: center; margin-bottom: 4px; }
+.miss-label {
+  font-family: var(--mono); font-size: 10.5px; color: var(--txt-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right;
+}
+.miss-track { display: flex; gap: 2px; }
+.miss-cell {
+  flex: 1; height: 13px; border-radius: 2px; background: var(--panel-3);
+  transition: background 0.3s var(--ease);
+}
+.miss-cell.na { background: var(--max); }
+.miss-cell.cur { outline: 2px solid var(--warn); outline-offset: 1px; }
+.miss-val { font-family: var(--mono); font-size: 10px; color: var(--txt-3); }
+.miss-row.has .miss-val { color: var(--max); font-weight: 650; }
+
+/* 数据表视图沿用 .df-* 样式；这里只补容器 */
+.view-pane .df-head { padding: 0 0 7px; border-bottom: none; }
+.view-pane .df-viewport { flex: 1 1 auto; }
