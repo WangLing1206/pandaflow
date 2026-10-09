@@ -8,6 +8,9 @@ pandas 的核心数据结构与统计方法，并把每个操作渲染成一串*
 
 **在线体验：** https://wangling1206.github.io/pandaflow/
 
+> **中英双语 · 明暗主题 · 59 个可回放操作 · 14 种联动图表**
+> 切换语言时，列名、每一帧解说、pandas 代码、图表标签会全部同步 —— 两种语言内容完全一致。
+
 ---
 
 ## 为什么做这个
@@ -36,16 +39,31 @@ PandaFlow 的回答是：把每一步都放慢、放大、演给你看。
 Frame = { phase, title, narration, duration, tone, code, table, stage, hud, final }
 ```
 
-### 2. 26 个 pandas 操作，覆盖完整分析流程
+### 2. 59 个 pandas 操作，覆盖完整分析流程
 
 | 分组 | 操作 |
 | --- | --- |
-| **概览** | `info` `describe` `head` `tail` |
-| **清洗** | **去除最大最小值 ★** `drop_duplicates` `dropna` `fillna` `clip` |
-| **变换** | `sort_values` `query` `assign` `astype` `rename` `sample` `nlargest` `drop` |
-| **统计** | `agg`（mean/median/std/sum…） `value_counts` `groupby` |
-| **可视化** | 直方图 柱状图 折线图 散点图 箱线图 |
+| **概览** | `info` `describe` `head` `tail` `corr` |
+| **选择与索引** | `loc` `iloc` `set_index` `reset_index` `select_dtypes` `insert` `pop` `isin` |
+| **清洗** | **去除最大最小值 ★** `drop_duplicates` `duplicated` `dropna` `fillna` `interpolate` `clip` |
+| **变换** | `sort_values` `sort_index` `query` `assign` `astype` `rename` `sample` `nlargest` `nsmallest` `drop` |
+| **序列运算** | `shift` `diff` `pct_change` `cumsum` `rolling` `rank` `cut/qcut` `where` `apply` |
+| **字符串** | `str.contains` `str.replace` `str.split` `str.upper` `str.len` |
+| **合并与重塑** | **merge ★** **pivot_table ★** `concat` `melt` `crosstab` |
+| **统计** | `agg` `value_counts` **groupby ★** |
+| **可视化** | 直方图 柱状图 折线图 散点图 箱线图 相关热力图 |
 | **导出** | `to_csv` + 整条管道总览 |
+
+### 2.1 分析视图与动画实时联动
+
+界面下方是「分析视图」面板，五个标签页：**数据表 / 图表 / 统计 / 缺失值 / 相关性**。
+每一帧都携带它那一刻的 `DataFrame` 快照，所以**动画删掉一行，箱线图立刻收紧；填充一个缺失值，缺失地图上的红点熄灭**。
+图表共 **14 种**可随时切换：直方图 · 箱线图 · 小提琴图 · 点阵图 · 密度曲线 · 累积分布 · Q-Q 图 · 折线 · 面积 · 散点 · 柱状 · 分组柱状 · 环形图 · 相关热力图。
+
+### 2.2 中英双语与明暗主题
+
+- **双语**：`L(zh, en)` 把文案包成双语对象；内置数据集的**列名与单元格也是双语的**，切换语言时按列顺序翻译管道配置并重放，状态不丢。
+- **主题**：中性灰底 + 单一强调色（靛蓝），明暗两套令牌，去掉早期版本的蓝黑重色；图表调色板从 CSS 令牌读取，换主题自动跟随。
 
 ### 3. 旗舰演示：去除最大值与最小值
 
@@ -101,21 +119,28 @@ src/
     datasets.js       内置数据集（含精心设计的演示剧情）
     frames.js         帧脚本模型
     utils.js          统计、格式化、缓动、DOM 工具
+    stats.js            核密度 / ECDF / Q-Q / 相关矩阵 / 五数概括
     ops/
-      index.js        操作注册表（26 个操作 + 参数表单声明）
-      outliers.js     离群值：去除极值 ★ / clip / nlargest
-      clean.js        清洗：drop_duplicates / dropna / fillna
-      transform.js    变换：sort / query / assign / astype / rename / sample / head / tail / drop
-      stats.js        统计：agg / describe / info / value_counts / groupby
-      plots.js        可视化：hist / bar / line / scatter / box
-      common.js       列摘要、单位、数值校验
+      index.js        操作注册表（59 个操作 + 参数表单声明）
+      kit.js          共用工具（列摘要、单位、数值校验、阶段标题）
+      clean.js        清洗与离群值
+      transform.js    变换 / 选择索引 / 序列运算
+      combine.js      merge / concat / pivot_table / melt / crosstab
+      stats.js        agg / describe / info / value_counts / groupby / corr
+      plots.js        可视化操作（图表与动画联动）
+      strings.js      字符串处理
   ui/
     player.js         帧播放器（播放 / 暂停 / 单步 / 变速 / 拖拽）
-    table.js          动画数据表（FLIP 式位移 + 进出场）
+    table.js          动画数据表（transform 位移 + 进出场）
     stage.js          舞台调度器 + 各 kind 渲染器
-    viz.js            SVG 可视化（点阵 / 排序 / 归约 / 图表）
+    viz.js            点阵 / 排序 / 归约 / 基础图表
+    charts.js         14 种图表引擎
+    views.js          分析视图面板（五标签页 + 联动开关）
     panels.js         操作库 / 管道 / 配置抽屉 / 导入 / 提示
     icons.js          线性图标集
+  i18n/
+    index.js          L() 双语字符串、t() 字典、语言状态
+    dict.js           界面文案字典（中英一一对应）
 tools/                测试与录屏脚本（Playwright，不参与部署）
 ```
 
@@ -144,6 +169,7 @@ python -m http.server 8777
 | **期末成绩单**（默认） | 38 × 9 | 同时含 **7 处缺失值**、**2 条重复录入**、**双向外离群值**（数学 99 与 38），以及可用于分组的班级维度 —— 一个数据集就能把整条清洗流程演示完整 |
 | 电商订单 | 42 × 8 | 金额列有极端离群值（12.8 万团购单 / 3 元异常单），适合演示 `clip` 与箱线图 |
 | 城市气温 | 36 × 5 | 多城市气象观测，适合折线图与分组聚合 |
+| 区域负责人 | 6 × 3 | 与订单表共享「城市」键，用于演示 merge 的四种连接 |
 
 也可以导入自己的 CSV / TSV / JSON，或直接粘贴 CSV 文本。
 
