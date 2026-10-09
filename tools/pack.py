@@ -4,8 +4,8 @@ import os
 import zipfile
 
 EXCLUDE_DIRS = {'.git', 'node_modules', 'shots', 'gallery', 'live',
-                'deliverables', 'video', '__pycache__', 'dist'}
-EXCLUDE_EXT = {'.zip', '.mp4', '.wav', '.pyc', '.webm'}
+                'deliverables', 'video', '__pycache__', 'dist', 'full', 'build'}
+EXCLUDE_EXT = {'.zip', '.mp4', '.wav', '.pyc', '.webm', '.png', '.jpg'}
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'PandaFlow-源代码.zip')

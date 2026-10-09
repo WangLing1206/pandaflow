@@ -19,7 +19,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const require_ = createRequire(join(HERE, '..', 'tools', 'noop.js'));
 const { chromium } = require_('playwright');
 const URL_ = process.env.URL || 'http://127.0.0.1:8777/index.html';
-const W = 1920, H = 1080;
+const W = 1600, H = 900;
 const GAP = 0.45;                 // 段间留白（秒）
 
 const FFMPEG = process.env.FFMPEG ||
@@ -51,62 +51,74 @@ const mouse = (seg, t, fx, fy, note = '') =>
   TL.push({ t: segStart[seg] + t, fx, fy, note, seg, kind: 'mouse' });
 
 /* --- s1 开场：片头卡 → 主界面 --- */
-at('s1', 8.2, `document.getElementById('bootStart').click()`, '关闭启动卡');
-mouse('s1', 12, 0.06, 0.30, '悬停左栏');
-mouse('s1', 16, 0.34, 0.30, '悬停舞台');
-mouse('s1', 21, 0.55, 0.55, '悬停数据表');
-mouse('s1', 26, 0.86, 0.40, '悬停检查器');
+at('s1', 8.0, `document.getElementById('bootStart').click()`, '关闭启动卡');
+mouse('s1', 12, 0.07, 0.30, '悬停左栏');
+mouse('s1', 17, 0.36, 0.30, '悬停舞台');
+mouse('s1', 22, 0.50, 0.65, '悬停视图');
+mouse('s1', 27, 0.88, 0.40, '悬停检查器');
 
-/* --- s2 界面导览 --- */
-at('s2', 1.0, `openGroup('可视化')`, '展开可视化分组');
-mouse('s2', 4.0, 0.08, 0.35, '左栏：操作库');
-mouse('s2', 9.0, 0.42, 0.22, '中上：舞台');
-mouse('s2', 14.5, 0.50, 0.62, '中下：数据表');
-mouse('s2', 21.0, 0.87, 0.42, '右侧：检查器');
-mouse('s2', 25.5, 0.50, 0.62, '回到数据表');
+/* --- s2 整体介绍 --- */
+at('s2', 0.8, `openGroup('清洗')`, '展开清洗分组');
+at('s2', 4.0, `openGroup('合并与重塑')`, '展开合并分组');
+at('s2', 8.0, `view('table')`, '切到数据表');
+mouse('s2', 10.5, 0.22, 0.45, '左栏：操作库');
+mouse('s2', 15.0, 0.42, 0.22, '中上：舞台');
+at('s2', 20.0, `view('stats')`, '切到统计视图');
+mouse('s2', 22.0, 0.50, 0.62, '中下：分析视图');
+at('s2', 26.0, `view('missing')`, '切到缺失值视图');
+mouse('s2', 29.0, 0.88, 0.42, '右侧：检查器');
 
-/* --- s3 结构概览 --- */
-at('s3', 0.4, `run('info', null, 0.7)`, '运行 info');
-at('s3', 20.5, `pause()`, '停在结果帧');
+/* --- s3 双语与主题 --- */
+at('s3', 1.0, `switchLang()`, '切到英文');
+at('s3', 12.0, `switchTheme()`, '切到浅色主题');
+at('s3', 21.5, `switchLang()`, '切回中文');
+at('s3', 26.0, `switchTheme()`, '切回深色主题');
 
 /* --- s4 旗舰演示 --- */
-at('s4', 0.4, `run('drop_extremes', {col:'数学',mode:'both'}, 1, 0)`, '第 0 帧：明确目标');
-at('s4', 11.0, `seek(1)`, '第 1 帧：比较规则');
-at('s4', 19.0, `playAt(2, 0.92)`, '开始逐行扫描');
-at('s4', 40.5, `pauseAt('lock')`, '停在锁定帧');
-at('s4', 47.0, `playAt('delete', 1.05)`, '播放删除过程');
-at('s4', 55.5, `pauseAt('deleteEnd')`, '停在索引断层');
-at('s4', 60.0, `seekAt('reset')`, 'reset_index');
-at('s4', 63.0, `seekAt('final')`, '结果对比');
+at('s4', 0.4, `view('table'); run('drop_extremes', {col:0, mode:'both'}, 1, 0)`, '第 0 帧');
+at('s4', 10.0, `seek(1)`, '比较规则');
+at('s4', 17.5, `playAt(2, 0.95)`, '开始扫描');
+at('s4', 38.0, `pauseAt('lock')`, '锁定极值');
+at('s4', 44.0, `playAt('delete', 1.05)`, '执行删除');
+at('s4', 51.5, `pauseAt('deleteEnd')`, '索引断层');
+at('s4', 55.5, `seekAt('reset')`, 'reset_index');
+at('s4', 58.5, `seekAt('final')`, '结果对比');
 
-/* --- s5 清洗操作族 --- */
-at('s5', 0.4, `reset(); run('drop_duplicates', null, 1.9)`, '重复行检测');
-at('s5', 12.5, `reset(); run('dropna', null, 2.0)`, '缺失值热力图');
-at('s5', 22.5, `reset(); run('fillna', null, 1.6)`, '缺失值填充');
-at('s5', 27.0, `pause()`, '停住');
+/* --- s5 图表联动 --- */
+at('s5', 0.4, `view('charts', 'violin')`, '小提琴图');
+at('s5', 6.0, `view('charts', 'box')`, '箱线图');
+at('s5', 11.0, `view('charts', 'hist')`, '直方图');
+at('s5', 16.0, `view('charts', 'strip')`, '点阵图');
+at('s5', 21.0, `view('charts', 'density')`, '密度曲线');
+at('s5', 26.0, `view('charts', 'ecdf')`, '累积分布');
+at('s5', 31.0, `view('charts', 'qq')`, 'Q-Q 图');
+at('s5', 35.5, `view('charts', 'scatter')`, '散点图');
 
-/* --- s6 变换与统计 --- */
-at('s6', 0.4, `reset(); run('sort_values', null, 1.5)`, '插入排序');
-at('s6', 12.4, `reset(); run('groupby', null, 2.2)`, '分组聚合');
-at('s6', 22.0, `reset(); run('agg', null, 1.8)`, '累加器求均值');
-at('s6', 30.8, `pause()`, '停住');
+/* --- s6 清洗与合并 --- */
+at('s6', 0.4, `reset(); view('table'); run('drop_duplicates', null, 2.4)`, '重复行检测');
+at('s6', 13.0, `reset(); run('dropna', null, 2.6)`, '缺失值热力图');
+at('s6', 22.5, `reset(); run('merge', null, 1.6)`, '两表连接');
+at('s6', 31.0, `reset(); run('pivot_table', null, 1.8)`, '透视表');
 
-/* --- s7 可视化 --- */
-at('s7', 0.4, `reset(); run('hist', null, 1.4)`, '直方图分箱');
-at('s7', 11.4, `reset(); run('box', null, 1.5)`, '箱线图与离群点');
-at('s7', 24.5, `pause()`, '停住');
+/* --- s7 序列运算与统计 --- */
+at('s7', 0.4, `reset(); run('rolling', null, 2.0)`, '滑动窗口');
+at('s7', 7.0, `reset(); run('diff', null, 2.2)`, '差分');
+at('s7', 13.0, `reset(); run('cut', null, 2.2)`, '分箱');
+at('s7', 19.0, `reset(); run('groupby', null, 2.0)`, '分组聚合');
+at('s7', 25.0, `reset(); run('agg', null, 2.4)`, '累加器求均值');
+at('s7', 30.0, `pause()`, '停住');
 
 /* --- s8 导入导出与总结 --- */
 at('s8', 0.4, `reset(); openImport()`, '打开数据集面板');
-mouse('s8', 4.0, 0.88, 0.38, '悬停内置数据集');
-mouse('s8', 8.0, 0.88, 0.62, '悬停导入区');
-at('s8', 12.6, `loadDataset('orders')`, '切换到电商订单');
-at('s8', 15.6, `loadDataset('weather')`, '切换到城市气温');
-at('s8', 18.6, `loadDataset('student')`, '切回成绩单');
-at('s8', 21.0, `buildPipeline()`, '静默构建一条管道');
-at('s8', 23.5, `run('export', null, 1.25)`, '导出总览');
-at('s8', 33.0, `seekAt('final')`, '导出卡片');
-at('s8', 37.2, `endCard()`, '片尾卡');
+mouse('s8', 3.5, 0.88, 0.38, '悬停内置数据集');
+mouse('s8', 7.0, 0.88, 0.62, '悬停导入区');
+at('s8', 11.0, `loadDataset('orders')`, '切换到电商订单');
+at('s8', 14.0, `loadDataset('weather')`, '切换到城市气温');
+at('s8', 17.0, `loadDataset('student')`, '切回成绩单');
+at('s8', 19.5, `buildPipeline()`, '静默构建管道');
+at('s8', 22.0, `run('export', null, 1.4)`, '导出总览');
+at('s8', 29.5, `seekAt('final')`, '导出卡片');
+at('s8', 32.5, `endCard()`, '片尾卡');
 
 TL.sort((a, b) => a.t - b.t);
 
@@ -114,9 +126,26 @@ TL.sort((a, b) => a.t - b.t);
 rmSync(join(HERE, 'raw'), { recursive: true, force: true });
 mkdirSync(join(HERE, 'raw'), { recursive: true });
 
+// 必须用 headful：headless Chrome 会把 screencast 节流，录出来是一张静止画面
 const browser = await chromium.launch({
   channel: 'chrome',
-  args: ['--force-device-scale-factor=1', '--hide-scrollbars', '--disable-lcd-text'],
+  headless: false,
+  args: [
+    `--window-size=${W},${H + 90}`,
+    '--window-position=0,0',
+    '--force-device-scale-factor=1',
+    '--hide-scrollbars',
+    '--disable-background-timer-throttling',
+    '--disable-backgrounding-occluded-windows',
+    '--disable-renderer-backgrounding',
+    '--disable-features=CalculateNativeWinOcclusion',
+    '--autoplay-policy=no-user-gesture-required',
+    '--no-first-run',
+    '--no-default-browser-check',
+    '--disable-features=Translate,BackForwardCache,OptimizationHints',
+    '--disable-session-crashed-bubble',
+    '--disable-infobars',
+  ],
 });
 const tVideo0 = Date.now();          // 视频从 context 创建（首个页面）开始计时
 const ctx = await browser.newContext({
@@ -165,12 +194,24 @@ const ACTIONS_SRC = `(code => {
     },
     run: (id, cfg, sp, seekTo) => {
       const op = getOp(id);
-      runOp(op, cfg || autoCfg(op, id === 'drop_extremes' ? { col: '数学' } : null));
+      let c = cfg || autoCfg(op, null);
+      // col:0 这样的占位符解析为当前语言的第一个数值列
+      const numeric = state.df.columns.filter((x) => state.df.dtypes[x] === 'number');
+      if (c && typeof c.col === 'number') c = { ...c, col: numeric[c.col] || numeric[0] };
+      runOp(op, c);
       player.pause();
       if (typeof seekTo === 'number') { player.seek(seekTo); player.setSpeed(sp || 1); }
       else { player.setSpeed(sp || 1); player.play(); }
     },
     reset: () => document.getElementById('btnReset').click(),
+    view: (tab, chartType) => {
+      const v = window.__PF__.viewPanel;
+      v.active = tab;
+      if (chartType) { v.chartType = chartType; v.cfg = {}; }
+      v.refresh();
+    },
+    switchLang: () => document.getElementById('btnLang').click(),
+    switchTheme: () => document.getElementById('btnTheme').click(),
     openImport: () => document.getElementById('dsChip').click(),
     loadDataset: (id) => R.loadDataset(id),
     openGroup: (n) => R.openGroup(n),

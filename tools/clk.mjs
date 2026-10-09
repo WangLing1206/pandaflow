@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ channel: 'chrome' });
+const p = await b.newPage({ viewport: { width: 1600, height: 900 } });
+await p.goto('http://127.0.0.1:8777/index.html', { waitUntil: 'domcontentloaded' });
+await p.waitForFunction(() => !!window.__PF__);
+await p.waitForTimeout(800);
+const before = await p.evaluate(() => !!document.getElementById('boot'));
+const r = await p.evaluate(() => { const el = document.getElementById('bootStart'); if (!el) return 'no-el'; el.click(); return 'clicked'; });
+await p.waitForTimeout(1500);
+const after = await p.evaluate(() => !!document.getElementById('boot'));
+console.log('synthetic click:', r, '| boot before:', before, '| boot after:', after);
+await b.close();

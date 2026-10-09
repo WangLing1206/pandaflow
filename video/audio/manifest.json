@@ -2,41 +2,41 @@
     {
         "id":  "s1",
         "file":  "E:\\2026-2027-1\\web5\\video\\audio\\s1.wav",
-        "chars":  174
+        "chars":  180
     },
     {
         "id":  "s2",
         "file":  "E:\\2026-2027-1\\web5\\video\\audio\\s2.wav",
-        "chars":  147
+        "chars":  156
     },
     {
         "id":  "s3",
         "file":  "E:\\2026-2027-1\\web5\\video\\audio\\s3.wav",
-        "chars":  116
+        "chars":  135
     },
     {
         "id":  "s4",
         "file":  "E:\\2026-2027-1\\web5\\video\\audio\\s4.wav",
-        "chars":  404
+        "chars":  366
     },
     {
         "id":  "s5",
         "file":  "E:\\2026-2027-1\\web5\\video\\audio\\s5.wav",
-        "chars":  155
+        "chars":  179
     },
     {
         "id":  "s6",
         "file":  "E:\\2026-2027-1\\web5\\video\\audio\\s6.wav",
-        "chars":  177
+        "chars":  228
     },
     {
         "id":  "s7",
         "file":  "E:\\2026-2027-1\\web5\\video\\audio\\s7.wav",
-        "chars":  124
+        "chars":  178
     },
     {
         "id":  "s8",
         "file":  "E:\\2026-2027-1\\web5\\video\\audio\\s8.wav",
-        "chars":  216
+        "chars":  189
     }
 ]
