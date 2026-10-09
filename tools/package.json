@@ -1,0 +1,10 @@
+{
+  "name": "pandaflow-tools",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "测试与录屏脚本（不参与网站部署）",
+  "dependencies": {
+    "playwright": "^1.64.0"
+  }
+}

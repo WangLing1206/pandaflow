@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+const URL = process.env.URL || 'http://127.0.0.1:8777/index.html';
+const browser = await chromium.launch({ channel: 'chrome' });
+const page = await browser.newPage({ viewport: { width: 1680, height: 1000 } });
+const logs = [];
+page.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`));
+page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}\n${(e.stack || '').split('\n').slice(0, 6).join('\n')}`));
+page.on('requestfailed', (r) => logs.push(`[reqfail] ${r.url()} :: ${r.failure()?.errorText}`));
+page.on('response', (r) => { if (r.status() >= 400) logs.push(`[http ${r.status()}] ${r.url()}`); });
+await page.goto(URL, { waitUntil: 'networkidle' });
+await page.waitForTimeout(2500);
+const has = await page.evaluate(() => ({ pf: typeof window.__PF__, boot: !!document.getElementById('boot') }));
+console.log('window.__PF__ =', has.pf, '| boot exists =', has.boot);
+console.log('--- logs ---');
+logs.forEach((l) => console.log(l));
+await browser.close();

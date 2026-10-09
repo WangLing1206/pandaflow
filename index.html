@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>熊猫数据流 PandaFlow · 可视化数据分析全过程</title>
+<meta name="description" content="以动态交互动画逐步呈现 pandas 数据处理全过程：加载、清洗、变换、统计、绘图、导出。不调用现成表格库，每一步都看得见。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2335e6dd'/%3E%3Cstop offset='1' stop-color='%23a98bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Cpath d='M9 23V11h6a4 4 0 010 8H9' stroke='%23061218' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles/main.css">
+<link rel="stylesheet" href="styles/stage.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ============================ 顶栏 ============================ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#061218" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 19V6h5a4 4 0 010 8H7"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">熊猫数据流</div>
+        <div class="brand-sub">PandaFlow</div>
+      </div>
+    </div>
+
+    <div class="top-sep"></div>
+
+    <button class="file-chip" id="dsChip" title="切换 / 导入数据集">
+      <span class="dot"></span>
+      <span id="dsName">期末成绩单</span>
+      <span class="meta" id="dsMeta">—</span>
+    </button>
+
+    <div class="top-spacer"></div>
+
+    <button class="btn sm" id="btnDemo" title="自动依次演示完整分析流程">✦ 一键演示</button>
+    <button class="btn sm" id="btnUndo" title="撤销上一步（回退到该步之前）">↶ 撤销</button>
+    <button class="btn sm" id="btnReset" title="恢复原始数据集">↺ 重置</button>
+    <div class="top-sep"></div>
+    <button class="btn ghost icon sm" id="btnLeft" title="折叠操作库">◧</button>
+    <button class="btn ghost icon sm" id="btnRight" title="折叠检查器">◨</button>
+  </header>
+
+  <!-- ============================ 左栏 ============================ -->
+  <aside class="sidebar" id="sidebar">
+    <section class="panel palette-panel">
+      <div class="panel-head">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/></svg>
+          操作库
+        </div>
+        <div class="top-spacer"></div>
+        <span class="badge" id="opCount">—</span>
+      </div>
+      <div class="panel-body" id="palette"></div>
+    </section>
+
+    <section class="panel pipeline-panel">
+      <div class="panel-head">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 5h18M3 12h18M3 19h18"/></svg>
+          处理管道
+        </div>
+        <div class="top-spacer"></div>
+        <span class="badge cyan" id="pipeCount">0</span>
+      </div>
+      <div class="panel-body" id="pipeline"></div>
+    </section>
+  </aside>
+
+  <!-- ============================ 中栏 ============================ -->
+  <main class="center">
+
+    <section class="panel stage-panel">
+      <div class="stage-head" id="stHead" data-tone="info">
+        <span class="stage-phase" id="stPhase">就绪</span>
+        <div class="stage-title" id="stTitle">选择左侧任意操作，开始逐步演示</div>
+        <div class="stage-hud" id="stHud"></div>
+      </div>
+      <div class="stage-body" id="stage"></div>
+
+      <div class="narration" id="narr" data-tone="info">
+        <div class="narration-icon" id="narrIcon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 16v-4M12 8h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="narration-text" id="narrText">
+          <b>欢迎使用熊猫数据流。</b>这里不是一个「点一下就出结果」的工具 —— 每一个 pandas 操作都会被拆解成一串可回放的帧，让你看清数据究竟是怎样一步步被处理的。
+        </div>
+        <div class="codebox" id="codebox">
+          <div class="codebox-head">
+            <span class="codebox-dot" style="background:#ff6b8a"></span>
+            <span class="codebox-dot" style="background:#ffc247"></span>
+            <span class="codebox-dot" style="background:#3ddc97"></span>
+            <span class="codebox-title">pandas 等价代码</span>
+          </div>
+          <div class="codebox-body" id="codeBody">
+            <div class="code-line"><span class="code-ln">1</span><span class="code-tx code-cm"># 选择操作后，这里会同步高亮对应的 pandas 代码</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="df-head">
+        <span class="df-var" id="dfVar">df</span>
+        <span class="df-shape" id="dfShape">—</span>
+        <span class="df-src" id="dfSrc"></span>
+        <span class="badge cyan" id="dfDtype">DataFrame</span>
+      </div>
+      <div id="dfView"></div>
+      <div class="df-foot" id="dfFoot"></div>
+    </section>
+
+    <div class="transport">
+      <div class="tp-btns">
+        <button class="btn ghost icon sm" id="tpFirst" title="回到第一帧 (Home)">⏮</button>
+        <button class="btn ghost icon sm" id="tpPrev" title="上一帧 (←)">◀</button>
+        <button class="tp-play" id="tpPlay" title="播放 / 暂停 (空格)">
+          <svg id="tpPlayIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l12 8-12 8V4z"/></svg>
+        </button>
+        <button class="btn ghost icon sm" id="tpNext" title="下一帧 (→)">▶</button>
+        <button class="btn ghost icon sm" id="tpLast" title="跳到最后一帧 (End)">⏭</button>
+      </div>
+      <div class="tp-progress">
+        <div class="tp-track" id="tpTrack">
+          <div class="tp-fill" id="tpFill"></div>
+          <div class="tp-marks" id="tpMarks"></div>
+        </div>
+      </div>
+      <div class="tp-file"><b id="tpStep">0</b> / <span id="tpTotal">0</span> 帧</div>
+      <div class="tp-speed">
+        <span class="tp-file">速度</span>
+        <div class="speed-pills" id="tpSpeed"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================ 右栏 ============================ -->
+  <aside class="inspector" id="inspector">
+    <section class="panel insp-dataset">
+      <div class="panel-head">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="12" cy="5.5" rx="8" ry="2.5"/><path d="M4 5.5v13C4 19.9 7.6 21 12 21s8-1.1 8-2.5v-13M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5"/></svg>
+          数据集
+        </div>
+        <div class="top-spacer"></div>
+        <button class="btn ghost sm" id="btnImport">切换 / 导入</button>
+      </div>
+      <div class="panel-body" id="inspDataset"></div>
+    </section>
+
+    <section class="panel insp-stats">
+      <div class="panel-head">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 4H6l6 8-6 8h12"/></svg>
+          describe 实时摘要
+        </div>
+        <div class="top-spacer"></div>
+        <span class="badge" id="statHint">随数据变化</span>
+      </div>
+      <div class="panel-body" id="inspStats"></div>
+    </section>
+
+    <section class="panel insp-chart">
+      <div class="panel-head">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20V9h3v11M10 20V4h3v16M16 20v-7h3v7M2 20h20"/></svg>
+          分布速览
+        </div>
+        <div class="top-spacer"></div>
+      </div>
+      <div class="sel-row">
+        <span class="sel-label">列</span>
+        <select class="sel" id="chartCol"></select>
+      </div>
+      <div class="panel-body" id="inspChart"></div>
+    </section>
+  </aside>
+</div>
+
+<!-- ============================ 启动引导 ============================ -->
+<div class="boot" id="boot">
+  <div class="boot-inner">
+    <div class="boot-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 19V6h5a4 4 0 010 8H7"/>
+      </svg>
+    </div>
+    <div class="boot-title">熊猫数据流 PandaFlow</div>
+    <div class="boot-sub">
+      把 pandas 的每一次数据处理，拆解成看得见的每一步。<br>
+      从原始数据到分析结论，全程动态演示。
+    </div>
+    <div class="boot-bar"><i></i></div>
+    <div class="boot-start">
+      <button class="btn primary" id="bootStart">开始探索</button>
+      <button class="btn" id="bootDemo">✦ 观看一键演示</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
